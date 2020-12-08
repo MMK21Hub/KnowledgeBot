@@ -7,10 +7,12 @@ import os
 token = open("token.txt",mode="r")
 
 client = discord.Client()
+branch = "main"
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('Logged in as {0.user}'.format(client))
+    print('\a')
 
 @client.event
 async def on_message(message):
@@ -36,11 +38,6 @@ async def on_message(message):
             await message.channel.send("You're not an admin!")
     if message.content.startswith("^admin "):
         if args[1] == "branch":
-            global branch
-            if "branch" in globals():
-                pass
-            else:
-                branch = "main"
             if args[2] != branch:
                 branch = args[2]
                 await message.add_reaction("✅")
@@ -81,5 +78,24 @@ async def on_message(message):
             for i in faqList:
                 faqListMD = faqListMD + "`" + i + "` "
             await message.channel.send("**Available FAQs: **"+faqListMD)
+
+    if message.content.startswith("^faq "):
+        branch = "main"
+        # Return the FAQ
+        await message.channel.trigger_typing()
+        faqList = list()
+        pyjson = json.loads(urllib.request.urlopen("https://api.github.com/repos/SheepCommander/KnowledgeBase/git/trees/773956d208ec33797566f2748bdf1139faba21da").read())
+        for faq in pyjson["tree"]:
+            faqList.append({
+                "name": faq["path"],
+                "url": faq["url"]
+            })
+        for faq in faqList:
+            if faq["name"] == args[1]:
+                requestedFAQ = {}
+                requestedFAQ["name"] = args[1]
+                pyjson = json.loads(urllib.request.urlopen(faq["url"]).read())
+                requestedFAQ["content"] = urllib.request.urlopen("https://raw.githubusercontent.com/sheepcommander/knowledgebase/main/1.16.4/"+requestedFAQ["name"]+"/viewable-github-paste.md").read().decode('UTF-8')
+                await message.channel.send(requestedFAQ["content"])
 
 client.run(token.read())
