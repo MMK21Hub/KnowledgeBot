@@ -48,6 +48,8 @@ async def on_message(message):
     if message.content.startswith("^update-cache"):
         async with message.channel.typing():
             await message.channel.send("Reloading!")
+            pyjson = urllib.request.urlopen("https://api.github.com/repos/sheepcommander/knowledgebase/branches/main").read().decode('UTF-8')
+            latestTree = urllib.request.urlopen(pyjson["commit"]["commit"]["tree"]["url"]).read().decode('UTF-8')
             time.sleep(0.5)
             rawjson = urllib.request.urlopen("https://launchermeta.mojang.com/mc/game/version_manifest.json").read()
             pyjson  = json.loads(rawjson)
@@ -58,6 +60,7 @@ async def on_message(message):
 
     if message.content.startswith("^pastes"):
         await message.channel.trigger_typing()
+        branch = "main"
         faqList = list()
         rawjson = urllib.request.urlopen("https://api.github.com/repos/SheepCommander/KnowledgeBase/branches/"+branch).read()
         pyjson  = json.loads(rawjson)
@@ -85,6 +88,34 @@ async def on_message(message):
         await message.channel.trigger_typing()
         faqList = list()
         pyjson = json.loads(urllib.request.urlopen("https://api.github.com/repos/SheepCommander/KnowledgeBase/git/trees/773956d208ec33797566f2748bdf1139faba21da").read())
+        for faq in pyjson["tree"]:
+            faqList.append({
+                "name": faq["path"],
+                "url": faq["url"]
+            })
+        for faq in faqList:
+            if faq["name"] == args[1]:
+                requestedFAQ = {}
+                requestedFAQ["name"] = args[1]
+                pyjson = json.loads(urllib.request.urlopen(faq["url"]).read())
+                requestedFAQ["content"] = urllib.request.urlopen("https://raw.githubusercontent.com/sheepcommander/knowledgebase/main/1.16.4/"+requestedFAQ["name"]+"/viewable-github-paste.md").read().decode('UTF-8')
+                await message.channel.send(requestedFAQ["content"])
+
+    if message.content.startswith("^oldfaq "):
+        branch = "main"
+        # Return a legacy FAQ
+        await message.channel.trigger_typing()
+        faqList = list()
+        pyjson = urllib.request.urlopen(latestTree).read().decode('UTF-8')
+        for folder in pyjson["tree"]:
+            if folder["path"] == "faq":
+                pyjson = urllib.request.urlopen(folder["url"]).read().decode('UTF-8')
+        for faq in pyjson["tree"]:
+            faqList.append({
+                "name": faq["path"],
+                "url": faq["url"]
+            })
+        
         for faq in pyjson["tree"]:
             faqList.append({
                 "name": faq["path"],
