@@ -3,7 +3,7 @@ import urllib.request
 import json
 import time
 import os
-
+from datetime import datetime
 token = open("token.txt",mode="r")
 
 client = discord.Client()
@@ -47,8 +47,8 @@ async def on_message(message):
 
     if message.content.startswith("^update-cache"):
         async with message.channel.typing():
-            await message.channel.send("Reloading!")
-            pyjson = urllib.request.urlopen("https://api.github.com/repos/sheepcommander/knowledgebase/branches/main").read().decode('UTF-8')
+            await message.channel.send("**Reloading!**")
+            pyjson = json.loads(urllib.request.urlopen("https://api.github.com/repos/sheepcommander/knowledgebase/branches/main").read().decode('UTF-8'))
             latestTree = urllib.request.urlopen(pyjson["commit"]["commit"]["tree"]["url"]).read().decode('UTF-8')
             time.sleep(0.5)
             rawjson = urllib.request.urlopen("https://launchermeta.mojang.com/mc/game/version_manifest.json").read()
@@ -56,7 +56,8 @@ async def on_message(message):
             await message.channel.send("Latest release: "+pyjson["latest"]["release"]+"\n"+"Latest snapshot: "+pyjson["latest"]["snapshot"])
             rawjson = urllib.request.urlopen("https://api.github.com/repos/SheepCommander/KnowledgeBase").read()
             pyjson  = json.loads(rawjson)
-            await message.channel.send("Repo last updated at: "+pyjson["updated_at"])
+            repoLastUpdate = datetime.fromisoformat(pyjson["updated_at"].replace("Z", "+00:00")) # Convert ISO-formatted time to python datetime object
+            await message.channel.send("Repo last updated at: "+repoLastUpdate.strftime("%x %X"))
 
     if message.content.startswith("^pastes"):
         await message.channel.trigger_typing()
@@ -111,7 +112,7 @@ async def on_message(message):
             if folder["path"] == "faq":
                 pyjson = urllib.request.urlopen(folder["url"]).read().decode('UTF-8')
         for faq in pyjson["tree"]:
-            faqList.append({
+            faqList.append({ 
                 "name": faq["path"],
                 "url": faq["url"]
             })
