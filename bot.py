@@ -8,6 +8,7 @@ token = open("token.txt",mode="r")
 
 client = discord.Client()
 branch = "main"
+latestTree = {}
 
 @client.event
 async def on_ready():
@@ -49,7 +50,7 @@ async def on_message(message):
         async with message.channel.typing():
             await message.channel.send("**Reloading!**")
             pyjson = json.loads(urllib.request.urlopen("https://api.github.com/repos/sheepcommander/knowledgebase/branches/main").read().decode('UTF-8'))
-            latestTree = urllib.request.urlopen(pyjson["commit"]["commit"]["tree"]["url"]).read().decode('UTF-8')
+            globals()["latestTree"] = json.loads(urllib.request.urlopen(pyjson["commit"]["commit"]["tree"]["url"]).read().decode('UTF-8'))
             time.sleep(0.5)
             rawjson = urllib.request.urlopen("https://launchermeta.mojang.com/mc/game/version_manifest.json").read()
             pyjson  = json.loads(rawjson)
@@ -107,10 +108,10 @@ async def on_message(message):
         # Return a legacy FAQ
         await message.channel.trigger_typing()
         faqList = list()
-        pyjson = urllib.request.urlopen(latestTree).read().decode('UTF-8')
+        pyjson = globals()["latestTree"] # Not sure what's going on here but it works
         for folder in pyjson["tree"]:
             if folder["path"] == "faq":
-                pyjson = urllib.request.urlopen(folder["url"]).read().decode('UTF-8')
+                pyjson = json.loads(urllib.request.urlopen(folder["url"]).read().decode('UTF-8'))
         for faq in pyjson["tree"]:
             faqList.append({ 
                 "name": faq["path"],
@@ -127,7 +128,7 @@ async def on_message(message):
                 requestedFAQ = {}
                 requestedFAQ["name"] = args[1]
                 pyjson = json.loads(urllib.request.urlopen(faq["url"]).read())
-                requestedFAQ["content"] = urllib.request.urlopen("https://raw.githubusercontent.com/sheepcommander/knowledgebase/main/1.16.4/"+requestedFAQ["name"]+"/viewable-github-paste.md").read().decode('UTF-8')
+                requestedFAQ["content"] = urllib.request.urlopen("https://raw.githubusercontent.com/sheepcommander/knowledgebase/main/faq/"+requestedFAQ["name"]+"/raw-paste.txt").read().decode('UTF-8')
                 await message.channel.send(requestedFAQ["content"])
 
 client.run(token.read())
