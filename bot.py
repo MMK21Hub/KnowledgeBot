@@ -27,7 +27,15 @@ async def on_message(message):
         await message.channel.send('Pong!')
 
     if message.content == "^help":
-        await message.channel.send("This server's prefix is `^`\n__**Commands**__\n`ping` - Check the bot's uptime\n`update-cache` - Contact the Github and Mojang servers\n`admin` - perform maintenance on the bot")
+        await message.channel.send('''
+        This server's prefix is `^`
+        __**Commands**__
+        `ping` - Check the bot's uptime
+        `update-cache` - Contact the Github and Mojang servers
+        `admin` - Perform maintenance on the bot
+        `faq` - Get an FAQ
+        `oldfaq` - Get a FAQ (legacy file structure)
+        ''')
 
     if message.content.startswith("^help "):
         await message.channel.send("No")
