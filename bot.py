@@ -90,6 +90,8 @@ async def on_message(message):
             faqListMD = ""
             for i in faqList:
                 faqListMD = faqListMD + "`" + i + "` "
+            if len(faqList) == 0:
+                faqListMD += "None!"
             await message.channel.send("**Available FAQs: **"+faqListMD)
 
     if message.content.startswith("^faq "):
