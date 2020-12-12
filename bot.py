@@ -20,6 +20,10 @@ latestTree = {}
 async def foo(ctx, arg):
     await ctx.send(arg)
 
+@bot.command()
+async def ping(ctx):
+    await ctx.send('Pong! Latency: `'+str(round(bot.latency*1000))+"ms`")
+
 @bot.event
 async def on_ready():
     print("Connected!")

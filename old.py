@@ -27,14 +27,22 @@ async def on_message(message):
 
     if message.content == "^help":
         await message.channel.send('''
-        This server's prefix is `^`
-        __**Commands**__
-        `ping` - Check the bot's status
-        `update-cache` - Contact the Github and Mojang servers
-        `admin` - Perform maintenance on the bot
+This server's prefix is `^`
+__**Commands**__
+`ping` - Check the bot's status
+`update-cache` - Contact the Github and Mojang servers
+`admin` - Perform maintenance on the bot
+    `admin branch`
+    `admin reconnect`
 
-        `faq` - Get an FAQ
-        `oldfaq` - Get a FAQ (legacy file structure)
+`faq` - Get an FAQ
+`oldfaq` - Get a FAQ (legacy file structure)
+`paste` - One command to find and get pastes
+    `paste get`
+    `paste search`
+    `paste get-old`
+    `paste get-path`
+    `paste link`
         ''')
 
     if message.content.startswith("^help "):
