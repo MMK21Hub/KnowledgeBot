@@ -24,6 +24,15 @@ async def foo(ctx, arg):
 async def ping(ctx):
     await ctx.send('Pong! Latency: `'+str(round(bot.latency*1000))+"ms`")
 
+@bot.group()
+async def admin(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("Subcommand pls.")
+
+@admin.command()
+async def disconnect(ctx):
+    await bot.close()
+
 @bot.event
 async def on_ready():
     print("Connected!")
