@@ -32,7 +32,7 @@ async def on_message(message):
         `ping` - Check the bot's status
         `update-cache` - Contact the Github and Mojang servers
         `admin` - Perform maintenance on the bot
-        
+
         `faq` - Get an FAQ
         `oldfaq` - Get a FAQ (legacy file structure)
         ''')
@@ -138,5 +138,6 @@ async def on_message(message):
                 pyjson = json.loads(urllib.request.urlopen(faq["url"]).read())
                 requestedFAQ["content"] = urllib.request.urlopen("https://raw.githubusercontent.com/sheepcommander/knowledgebase/main/faq/"+requestedFAQ["name"]+"/raw-paste.txt").read().decode('UTF-8')
                 await message.channel.send(requestedFAQ["content"])
+                break
 
 client.run(token.read())
