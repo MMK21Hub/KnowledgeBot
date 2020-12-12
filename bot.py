@@ -13,7 +13,6 @@ latestTree = {}
 @client.event
 async def on_ready():
     print('Logged in as {0.user}'.format(client))
-    print('\a')
 
 @client.event
 async def on_message(message):
@@ -24,15 +23,16 @@ async def on_message(message):
         return
 
     if message.content.startswith('^ping'):
-        await message.channel.send('Pong!')
+        await message.channel.send('Pong! Latency: `'+str(round(client.latency*1000))+"ms`")
 
     if message.content == "^help":
         await message.channel.send('''
         This server's prefix is `^`
         __**Commands**__
-        `ping` - Check the bot's uptime
+        `ping` - Check the bot's status
         `update-cache` - Contact the Github and Mojang servers
         `admin` - Perform maintenance on the bot
+        
         `faq` - Get an FAQ
         `oldfaq` - Get a FAQ (legacy file structure)
         ''')
