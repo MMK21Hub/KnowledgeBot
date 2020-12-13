@@ -42,6 +42,12 @@ async def disconnect(ctx):
     await ctx.channel.send("Goodbye.")
     await bot.close()
 
+@bot.group()
+async def mc(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.message.add_reaction("❌")
+        await ctx.send("❌ **Incorrect or missing subcommand.**",embed=discord.Embed(description="Command help - `"+bot.command_prefix+"help mc`"))
+
 @bot.event
 async def on_ready():
     print("Connected!")
@@ -49,6 +55,6 @@ async def on_ready():
 # Errors
 @bot.event
 async def on_command_error(ctx, error):
-    await ctx.send("❌ Unhandled error: `"+error+"`")
+    await ctx.send("❌ Unhandled error: `"+str(error)+"`")
 
 bot.run(token.read())
