@@ -1,7 +1,5 @@
 import discord
-from discord import client
 from discord.ext import commands
-import asyncio
 
 import urllib.request
 import json
