@@ -48,9 +48,15 @@ async def mc(ctx):
         await ctx.message.add_reaction("❌")
         await ctx.send("❌ **Incorrect or missing subcommand.**",embed=discord.Embed(description="Command help - `"+bot.command_prefix+"help mc`"))
 
-@mc.command(brief="Structured item data", description="Returns JSON data for a Minecraft item, to reduce reliance on the MCW.")
-async def item(ctx,item):
-    pass
+@mc.command(brief="Structured block infomation", description="Returns JSON data for a Minecraft block, to reduce reliance on the MCW.")
+async def block(ctx,block):
+    f = open("assets/minecraft-data/minecraft/item.json")
+    blocks = json.loads(f.read())
+    for entry in blocks["entries"]:
+        if entry["name"] == block:
+            output = json.dumps(entry,indent=2)
+            await ctx.send("```json\n"+output+"\n```")
+            break
 
 @bot.event
 async def on_ready():
