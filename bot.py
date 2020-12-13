@@ -20,7 +20,7 @@ latestTree = {}
 async def foo(ctx, arg):
     await ctx.send(arg)
 
-@bot.command()
+@bot.command(brief="Check the bot's status", description = "Check that the bot is alive. Also returns latency.")
 async def ping(ctx):
     await ctx.send('Pong! Latency: `'+str(round(bot.latency*1000))+"ms`")
 
@@ -37,7 +37,7 @@ async def admin_error(ctx, error):
         await ctx.message.add_reaction("❌")
         await ctx.send("❌ **You do not have permission.**")
 
-@admin.command()
+@admin.command(brief="Big red button", description = "Immediately closes the bot's connection to Discord.")
 async def disconnect(ctx):
     await ctx.channel.send("Goodbye.")
     await bot.close()
