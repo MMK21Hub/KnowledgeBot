@@ -15,11 +15,6 @@ bot = commands.Bot(command_prefix='^')
 branch = "main"
 latestTree = {}
 
-# Errors
-@bot.event
-async def on_command_error(ctx, error):
-    await ctx.send("❌ Unhandled error: `"+error+"`")
-
 # Bot command declarations
 @bot.command()
 async def foo(ctx, arg):
@@ -50,5 +45,10 @@ async def disconnect(ctx):
 @bot.event
 async def on_ready():
     print("Connected!")
+
+# Errors
+@bot.event
+async def on_command_error(ctx, error):
+    await ctx.send("❌ Unhandled error: `"+error+"`")
 
 bot.run(token.read())
