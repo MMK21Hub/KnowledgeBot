@@ -52,11 +52,15 @@ async def mc(ctx):
 async def block(ctx,block):
     f = open("assets/minecraft-data/minecraft/item.json")
     blocks = json.loads(f.read())
-    for entry in blocks["entries"]:
-        if entry["name"] == block:
-            output = json.dumps(entry,indent=2)
-            await ctx.send("```json\n"+output+"\n```")
-            break
+    if block in blocks["entries"]:
+        for entry in blocks["entries"]:
+            if entry["name"] == block:
+                output = json.dumps(entry,indent=2)
+                await ctx.send("```json\n"+output+"\n```")
+                break
+    else:
+        await ctx.message.add_reaction("❌")
+        await ctx.send("❌ **Could not find a block with the namespaced ID of `"+block+"`**",embed=discord.Embed(title="Things to try",description=" 1. Check your spelling.\n 2. Is your ID correct? E.g. `minecraft:beef` is incorrect.\n 2. Have you included the namespace? E.g. `cooked_steak` is invalid.\n 3. Is your block from the wrong Minecraft version?"))
 
 @bot.event
 async def on_ready():
