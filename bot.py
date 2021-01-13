@@ -75,6 +75,25 @@ async def block(ctx, block):
 async def on_ready():
     print("Connected!")
 
+
+@bot.group(description="Preform common tasks without needing to open up the Minecraft Launcher", brief="Utils related to the MC launcher")
+async def launcher(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.message.add_reaction("❌")
+        await ctx.send("❌ **Incorrect or missing subcommand.**", embed=discord.Embed(description="Command help - `"+bot.command_prefix+"help launcher`"))
+
+
+@launcher.command(brief="")
+async def notices(ctx):
+    noticeList = json.loads(urllib.request.urlopen(
+        "https://launchercontent.mojang.com/alertMessaging.json").read().decode('UTF-8'))
+    if len(noticeList["entries"]) == 0:
+        await ctx.send("**No notices!**")
+    elif len(noticeList["entries"]) > 0:
+        await ctx.send(len(noticeList["entries"])+" notices are available. I haven't implemented notices yet, as I have no idea what the format for them will be. (<@484593355859427329> fix it!)\nHere's the raw JSON:")
+        for notice in noticeList:
+            await ctx.send("```json\n"+notice+"\n```")
+
 # Errors
 
 
