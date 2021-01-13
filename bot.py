@@ -83,7 +83,7 @@ async def launcher(ctx):
         await ctx.send("❌ **Incorrect or missing subcommand.**", embed=discord.Embed(description="Command help - `"+bot.command_prefix+"help launcher`"))
 
 
-@launcher.command(brief="")
+@launcher.command(brief="Receive important infomation", description="Infomation from Mojang about scheduled downtime etc. Usually empty.")
 async def notices(ctx):
     noticeList = json.loads(urllib.request.urlopen(
         "https://launchercontent.mojang.com/alertMessaging.json").read().decode('UTF-8'))
