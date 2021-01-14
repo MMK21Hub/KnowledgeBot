@@ -55,6 +55,7 @@ def newsToEmbed(newsItem):
     embed.set_author(
         name=newsItem["category"]
     )
+    return embed
 
 
 # Global variables
@@ -123,7 +124,7 @@ async def on_ready():
     print("Connected!")
 
 
-@bot.group(description="Preform common tasks without needing to open up the Minecraft Launcher", brief="Utils related to the MC launcher")
+@bot.group(description="Preform common tasks without needing to open up the Minecraft Launcher. See subcommands for more options.", brief="Utils related to the MC launcher")
 async def launcher(ctx):
     if ctx.invoked_subcommand is None:
         await ctx.message.add_reaction("❌")
@@ -180,12 +181,22 @@ async def get(ctx, id):
         await ctx.send("❌ Could not find a news item with ID of `"+id+"`")
 
 
+@news.command(brief="View the latest news item")
+async def latest(ctx):
+    if globals()["newsList"] == {}:
+        newsList = json.loads(urllib.request.urlopen(
+            "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+    else:
+        newsList = globals()["newsList"]
+    await ctx.send("", embed=newsToEmbed(newsList["entries"][0]))
+
+
 # Errors
 
 
 @ bot.event
 async def on_command_error(ctx, error):
     await ctx.send("❌ Unhandled error: `"+str(error)+"`")
-    traceback.print_exc()
+    # traceback.print_exception(error)
 
 bot.run(token.read())
