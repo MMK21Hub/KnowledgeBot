@@ -41,7 +41,7 @@ def intToEmoji(number):
 # Global variables
 branch = "main"
 latestTree = {}
-newslist = {}
+newsList = {}
 
 # Bot command declarations
 
@@ -147,9 +147,11 @@ async def news(ctx):
 
 @news.command(brief="View a specific news item")
 async def get(ctx, id):
-    if newslist == {}:
+    if globals()["newsList"] == {}:
         newsList = json.loads(urllib.request.urlopen(
             "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+    else:
+        newsList = globals()["newsList"]
 
     # Errors
 
