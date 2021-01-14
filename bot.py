@@ -127,9 +127,11 @@ async def notices(ctx):
 @launcher.group(brief="Latest Minecraft news", description="Get the 10 latest MC News posts across all categories. See subcommands for more options.")
 async def news(ctx):
     await ctx.channel.trigger_typing()
-    if newslist == {}:
+    if globals()["newsList"] == {}:
         newsList = json.loads(urllib.request.urlopen(
             "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+    else:
+        newsList = globals()["newsList"]
 
     output = ""
     newses = 0
@@ -141,6 +143,13 @@ async def news(ctx):
     if output == "":
         output = "**No news found!**"
     await ctx.send(output)
+
+
+@news.command(brief="View a specific news item")
+async def get(ctx, id):
+    if newslist == {}:
+        newsList = json.loads(urllib.request.urlopen(
+            "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
 
     # Errors
 
