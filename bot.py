@@ -1,6 +1,6 @@
 import traceback
 import discord
-from discord.embeds import Embed
+from discord.embeds import Embed, EmbedProxy
 from discord.ext import commands
 
 import urllib.request
@@ -156,7 +156,22 @@ async def get(ctx, id):
         newsList = globals()["newsList"]
     for newsItem in newsList["entries"]:
         if newsItem["id"] == id:
-            await ctx.send(embed=discord.Embed(title=newsItem["title"]))
+            embed = discord.Embed(
+                title=newsItem["title"],
+                url=newsItem["readMoreLink"],
+                description=newsItem["text"]
+            )
+            embed.set_image(
+                url="https://launchercontent.mojang.com/" +
+                    newsItem["playPageImage"]["url"]
+            )
+            embed.set_footer(
+                text=newsItem["date"]
+            )
+            embed.set_author(
+                name=newsItem["category"]
+            )
+            await ctx.send(embed=embed)
             found = True
     if not found:
         await ctx.send("❌ Could not find a news item with ID of `"+id+"`")
@@ -165,7 +180,7 @@ async def get(ctx, id):
 # Errors
 
 
-@bot.event
+@ bot.event
 async def on_command_error(ctx, error):
     await ctx.send("❌ Unhandled error: `"+str(error)+"`")
     traceback.print_exc()
