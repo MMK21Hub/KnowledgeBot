@@ -1,5 +1,6 @@
 import traceback
 import discord
+from discord.embeds import Embed
 from discord.ext import commands
 
 import urllib.request
@@ -124,7 +125,7 @@ async def notices(ctx):
             await ctx.send("```json\n"+notice+"\n```")
 
 
-@launcher.group(brief="Latest Minecraft news", description="Get the 10 latest MC News posts across all categories. See subcommands for more options.")
+@launcher.group(brief="Latest Minecraft news", description="Get the 10 latest MC News posts across all categories. See subcommands for more options.", invoke_without_command=True)
 async def news(ctx):
     await ctx.channel.trigger_typing()
     if globals()["newsList"] == {}:
@@ -147,13 +148,21 @@ async def news(ctx):
 
 @news.command(brief="View a specific news item")
 async def get(ctx, id):
+    found = False
     if globals()["newsList"] == {}:
         newsList = json.loads(urllib.request.urlopen(
             "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
     else:
         newsList = globals()["newsList"]
+    for newsItem in newsList["entries"]:
+        if newsItem["id"] == id:
+            await ctx.send(embed=discord.Embed(title=newsItem["title"]))
+            found = True
+    if not found:
+        await ctx.send("❌ Could not find a news item with ID of `"+id+"`")
 
-    # Errors
+
+# Errors
 
 
 @bot.event
