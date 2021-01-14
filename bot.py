@@ -1,3 +1,4 @@
+import traceback
 import discord
 from discord.ext import commands
 
@@ -10,6 +11,32 @@ from datetime import datetime
 # Discord stuff
 token = open("token.txt", mode="r")
 bot = commands.Bot(command_prefix='^')
+
+
+def intToEmoji(number):
+    if number == 0:
+        return ":zero:"
+    if number == 1:
+        return ":one:"
+    if number == 2:
+        return ":two:"
+    if number == 3:
+        return ":three:"
+    if number == 4:
+        return ":four:"
+    if number == 5:
+        return ":five:"
+    if number == 6:
+        return ":six:"
+    if number == 7:
+        return ":seven:"
+    if number == 8:
+        return ":eight:"
+    if number == 9:
+        return ":nine:"
+    if number == 10:
+        return ":keycap_ten:"
+
 
 # Global variables
 branch = "main"
@@ -85,6 +112,7 @@ async def launcher(ctx):
 
 @launcher.command(brief="Receive important infomation", description="Infomation from Mojang about scheduled downtime etc. Usually empty.")
 async def notices(ctx):
+    await ctx.channel.trigger_typing()
     noticeList = json.loads(urllib.request.urlopen(
         "https://launchercontent.mojang.com/alertMessaging.json").read().decode('UTF-8'))
     if len(noticeList["entries"]) == 0:
@@ -94,11 +122,33 @@ async def notices(ctx):
         for notice in noticeList:
             await ctx.send("```json\n"+notice+"\n```")
 
-# Errors
+
+@launcher.command(brief="Latest Minecraft news", description="Returns the 10 latest news entries for the specified category.")
+async def news(ctx, cat="Minecraft: Java Edition"):
+    await ctx.channel.trigger_typing()
+    cat = cat.lower()
+    if cat == "mc" or cat == "mcje" or cat == "je" or cat == "java" or cat == "minecraft: java edition":
+        cat = "Minecraft: Java Edition"
+    newsList = json.loads(urllib.request.urlopen(
+        "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+
+    output = ""
+    newses = 0
+    for newsItem in newsList["entries"]:
+        if newses != 10:
+            output = output + intToEmoji(newses + 1) + " **" + newsItem["title"] + "** " + \
+                "[`" + newsItem["id"] + "`]\n"
+            newses = newses + 1
+    if output == "":
+        output = "**No news found!**"
+    await ctx.send(output)
+
+    # Errors
 
 
 @bot.event
 async def on_command_error(ctx, error):
     await ctx.send("❌ Unhandled error: `"+str(error)+"`")
+    traceback.print_exc()
 
 bot.run(token.read())
