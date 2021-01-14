@@ -146,7 +146,7 @@ async def news(ctx):
     await ctx.send(output)
 
 
-@news.command(brief="View a specific news item")
+@news.command(brief="View a specific news item", description="Get the full details of a news item from its ID.")
 async def get(ctx, id):
     found = False
     if globals()["newsList"] == {}:
