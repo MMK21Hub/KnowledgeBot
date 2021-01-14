@@ -123,12 +123,9 @@ async def notices(ctx):
             await ctx.send("```json\n"+notice+"\n```")
 
 
-@launcher.command(brief="Latest Minecraft news", description="Returns the 10 latest news entries for the specified category.")
-async def news(ctx, cat="Minecraft: Java Edition"):
+@launcher.group(brief="Latest Minecraft news", description="Get the 10 latest MC News posts across all categories. See subcommands for more options.")
+async def news(ctx):
     await ctx.channel.trigger_typing()
-    cat = cat.lower()
-    if cat == "mc" or cat == "mcje" or cat == "je" or cat == "java" or cat == "minecraft: java edition":
-        cat = "Minecraft: Java Edition"
     newsList = json.loads(urllib.request.urlopen(
         "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
 
