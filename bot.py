@@ -40,9 +40,13 @@ def intToEmoji(number):
 
 
 def newsToEmbed(newsItem):
+    try:
+        link = newsItem["readMoreLink"]
+    except:
+        link = newsItem["linkButton"]["url"]
     embed = discord.Embed(
         title=newsItem["title"],
-        url=newsItem["readMoreLink"],
+        url=link,
         description=newsItem["text"]
     )
     embed.set_image(
@@ -167,6 +171,7 @@ async def news(ctx):
 
 @news.command(brief="View a specific news item", description="Get the full details of a news item from its ID.")
 async def get(ctx, id):
+    await ctx.channel.trigger_typing()
     found = False
     if globals()["newsList"] == {}:
         newsList = json.loads(urllib.request.urlopen(
@@ -183,6 +188,7 @@ async def get(ctx, id):
 
 @news.command(brief="View the latest news item")
 async def latest(ctx):
+    await ctx.channel.trigger_typing()
     if globals()["newsList"] == {}:
         newsList = json.loads(urllib.request.urlopen(
             "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
@@ -191,10 +197,35 @@ async def latest(ctx):
     await ctx.send("", embed=newsToEmbed(newsList["entries"][0]))
 
 
+@news.command(brief="List the latest news items", name="list")
+async def listNews(ctx, limit=10):
+    await ctx.channel.trigger_typing()
+    if globals()["newsList"] == {}:
+        newsList = json.loads(urllib.request.urlopen(
+            "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+    else:
+        newsList = globals()["newsList"]
+
+    output = ""
+    count = 0
+    for newsItem in newsList["entries"]:
+        if count != limit:
+            if limit <= 10:
+                prefix = intToEmoji(count+1)
+            else:
+                prefix = ":hash:"
+            output = output + prefix + " **" + newsItem["title"] + "** " + \
+                "[`" + newsItem["id"] + "`]\n"
+            count = count + 1
+    if output == "":
+        output = "**No news found!**"
+    await ctx.send(output)
+
+
 # Errors
 
 
-@ bot.event
+@bot.event
 async def on_command_error(ctx, error):
     await ctx.send("❌ Unhandled error: `"+str(error)+"`")
     # traceback.print_exception(error)
