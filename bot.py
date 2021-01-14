@@ -39,6 +39,24 @@ def intToEmoji(number):
         return ":keycap_ten:"
 
 
+def newsToEmbed(newsItem):
+    embed = discord.Embed(
+        title=newsItem["title"],
+        url=newsItem["readMoreLink"],
+        description=newsItem["text"]
+    )
+    embed.set_image(
+        url="https://launchercontent.mojang.com/" +
+            newsItem["playPageImage"]["url"]
+    )
+    embed.set_footer(
+        text=newsItem["date"]
+    )
+    embed.set_author(
+        name=newsItem["category"]
+    )
+
+
 # Global variables
 branch = "main"
 latestTree = {}
@@ -156,22 +174,7 @@ async def get(ctx, id):
         newsList = globals()["newsList"]
     for newsItem in newsList["entries"]:
         if newsItem["id"] == id:
-            embed = discord.Embed(
-                title=newsItem["title"],
-                url=newsItem["readMoreLink"],
-                description=newsItem["text"]
-            )
-            embed.set_image(
-                url="https://launchercontent.mojang.com/" +
-                    newsItem["playPageImage"]["url"]
-            )
-            embed.set_footer(
-                text=newsItem["date"]
-            )
-            embed.set_author(
-                name=newsItem["category"]
-            )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=newsToEmbed(newsItem))
             found = True
     if not found:
         await ctx.send("❌ Could not find a news item with ID of `"+id+"`")
