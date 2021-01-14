@@ -41,6 +41,7 @@ def intToEmoji(number):
 # Global variables
 branch = "main"
 latestTree = {}
+newslist = {}
 
 # Bot command declarations
 
@@ -126,8 +127,9 @@ async def notices(ctx):
 @launcher.group(brief="Latest Minecraft news", description="Get the 10 latest MC News posts across all categories. See subcommands for more options.")
 async def news(ctx):
     await ctx.channel.trigger_typing()
-    newsList = json.loads(urllib.request.urlopen(
-        "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
+    if newslist == {}:
+        newsList = json.loads(urllib.request.urlopen(
+            "https://launchercontent.mojang.com/news.json").read().decode('UTF-8'))
 
     output = ""
     newses = 0
