@@ -214,7 +214,14 @@ async def listNews(ctx, limit=10):
                 prefix = intToEmoji(count+1)
             else:
                 prefix = ":hash:"
-            output = output + prefix + " **" + newsItem["title"] + "** " + \
+            newsType = ""
+            for i in newsItem["newsType"]:
+                if i == "Java":
+                    newsType = "<:mmk21bot__mcje:799363479316201543>"
+                elif i == "Dungeons":
+                    newsType = "<:mmk21bot__dungeons:799916874263560233>"
+
+            output = output + newsType + " **" + newsItem["title"] + "** " + \
                 "[`" + newsItem["id"] + "`]\n"
             count = count + 1
     if output == "":
