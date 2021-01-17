@@ -184,7 +184,7 @@ async def on_ready():
     print("Connected!")
 
 
-@bot.group(description="Preform common tasks without needing to open up the Minecraft Launcher. See subcommands for more options.", brief="Utils related to the MC launcher")
+@bot.group(description="Preform common tasks without needing to open up the Minecraft Launcher. See subcommands for more options.", brief="Utils related to the MC launcher", aliases=["l"])
 async def launcher(ctx):
     if ctx.invoked_subcommand is None:
         await ctx.message.add_reaction("❌")
@@ -285,7 +285,7 @@ async def listNews(ctx, limit=10):
     await ctx.send(output)
 
 
-@launcher.group(brief="View patch notes", invoke_without_command=True)
+@launcher.group(brief="View patch notes", invoke_without_command=True, aliases=["h", "hist"])
 async def history(ctx):
     await ctx.send("❌ **Incorrect or missing subcommand**\nTry `launcher history mc`.")
 
