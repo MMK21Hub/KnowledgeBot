@@ -1,14 +1,16 @@
+from datetime import datetime
+import os
+import time
+import json
+import urllib.request
 import traceback
 import discord
 from discord.embeds import Embed, EmbedProxy
 from discord.ext import commands
 import html2text
-
-import urllib.request
-import json
-import time
-import os
-from datetime import datetime
+processor = html2text.HTML2Text()
+processor.unicode_snob = True
+processor.single_line_break = True
 
 # Discord stuff
 token = open("token.txt", mode="r")
@@ -60,6 +62,59 @@ def newsToEmbed(newsItem):
     embed.set_author(
         name=newsItem["category"]
     )
+    return embed
+
+
+def patchNoteToEmbed(patchNote, project):
+    desc = processor.handle(patchNote["body"])
+    if len(desc) > 2048:
+        desc = "Patch note too long to display!"
+    if project == "MC":
+        embed = discord.Embed(
+            title=patchNote["title"],
+            description=desc
+        )
+        try:
+            embed.set_image(
+                url="https://launchercontent.mojang.com" +
+                    patchNote["image"]["url"]
+            )
+        except:
+            pass
+        embed.set_footer(
+            text="Type: "+patchNote["type"].capitalize()
+        )
+    else:
+        embed = discord.Embed(
+            title=patchNote["date"],
+            description=desc
+        )
+        try:
+            # Some versions have a popup when that version is updated to. The image is pulled from there.
+            embed.set_image(
+                url="https://launchercontent.mojang.com" +
+                    patchNote["highlight"]["image"]["url"]
+            )
+        except:
+            pass
+        author = "Unknown version number"
+        icon = ""
+        try:
+            if patchNote["versions"]["windows"]:
+                author = "\nWindows " + \
+                    patchNote["versions"]["windows"]
+                icon = "https://raw.githubusercontent.com/MMK21Hub/HTML/gh-pages/windows-big.png"
+            if patchNote["versions"]["linux"]:
+                author = author + "\nLinux "+patchNote["versions"]["linux"]
+                icon = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/TuxFlat.svg/199px-TuxFlat.svg.png"
+        except:
+            pass
+        if len(patchNote["versions"]) != 1:
+            icon = ""
+        embed.set_author(
+            name=author,
+            icon_url=icon
+        )
     return embed
 
 
@@ -237,11 +292,13 @@ async def history(ctx):
 
 @history.command(brief="Get a specific version's patch notes", name="get")
 async def historyGet(ctx, version):
+    await ctx.channel.trigger_typing()
     javaPatchNotes = json.loads(urllib.request.urlopen(
         "https://launchercontent.mojang.com/javaPatchNotes.json").read().decode('UTF-8'))
     launcherPatchNotes = json.loads(
         urllib.request.urlopen("https://launchercontent.mojang.com/launcherPatchNotes_v2.json").read().decode('UTF-8'))
     patchNote = {}
+    project = "other"
     for i in javaPatchNotes["entries"]:
         if i["version"] == version:
             patchNote = i
@@ -254,7 +311,7 @@ async def historyGet(ctx, version):
     if patchNote == {}:
         await ctx.send("❌ Could not find `"+version+"` in the Launcher patch notes or the Minecraft: Java Edition patch notes.\nMake sure it is in the format `x.y.z`.")
     else:
-        await ctx.send(html2text.html2text(patchNote["body"]))
+        await ctx.send(embed=patchNoteToEmbed(patchNote, project))
 
 
 # Errors
