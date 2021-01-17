@@ -2,6 +2,7 @@ import traceback
 import discord
 from discord.embeds import Embed, EmbedProxy
 from discord.ext import commands
+import html2text
 
 import urllib.request
 import json
@@ -227,6 +228,33 @@ async def listNews(ctx, limit=10):
     if output == "":
         output = "**No news found!**"
     await ctx.send(output)
+
+
+@launcher.group(brief="View patch notes", invoke_without_command=True)
+async def history(ctx):
+    await ctx.send("❌ **Incorrect or missing subcommand**\nTry `launcher history mc`.")
+
+
+@history.command(brief="Get a specific version's patch notes", name="get")
+async def historyGet(ctx, version):
+    javaPatchNotes = json.loads(urllib.request.urlopen(
+        "https://launchercontent.mojang.com/javaPatchNotes.json").read().decode('UTF-8'))
+    launcherPatchNotes = json.loads(
+        urllib.request.urlopen("https://launchercontent.mojang.com/launcherPatchNotes_v2.json").read().decode('UTF-8'))
+    patchNote = {}
+    for i in javaPatchNotes["entries"]:
+        if i["version"] == version:
+            patchNote = i
+            project = "MC"
+    for i in launcherPatchNotes["entries"]:
+        for patchVersion in i["versions"]:
+            if i["versions"][patchVersion] == version:
+                patchNote = i
+                project = "MCL"
+    if patchNote == {}:
+        await ctx.send("❌ Could not find `"+version+"` in the Launcher patch notes or the Minecraft: Java Edition patch notes.\nMake sure it is in the format `x.y.z`.")
+    else:
+        await ctx.send(html2text.html2text(patchNote["body"]))
 
 
 # Errors
