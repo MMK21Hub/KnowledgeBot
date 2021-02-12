@@ -66,7 +66,7 @@ def newsToEmbed(newsItem):
 
 
 def patchNoteToEmbed(patchNote, project):
-    desc = processor.handle(patchNote["body"])
+    desc = processor.handle(patchNote["body"]).replace("# ", "")
     if len(desc) > 2048:
         desc = "Patch note too long to display!"
     if project == "MC":
@@ -83,6 +83,21 @@ def patchNoteToEmbed(patchNote, project):
             pass
         embed.set_footer(
             text="Type: "+patchNote["type"].capitalize()
+        )
+    elif project == "MCD":
+        embed = discord.Embed(
+            title=patchNote["title"],
+            description=desc
+        )
+        embed.set_footer(
+            text=patchNote["date"],
+        )
+        embed.set_image(
+            url="https://launchercontent.mojang.com" +
+            patchNote["image"]["url"]
+        )
+        embed.set_author(
+            name=patchNote["version"]
         )
     else:
         embed = discord.Embed(
@@ -297,6 +312,8 @@ async def historyGet(ctx, version):
         "https://launchercontent.mojang.com/javaPatchNotes.json").read().decode('UTF-8'))
     launcherPatchNotes = json.loads(
         urllib.request.urlopen("https://launchercontent.mojang.com/launcherPatchNotes_v2.json").read().decode('UTF-8'))
+    dungeonsPatchNotes = json.loads(urllib.request.urlopen(
+        "https://launchercontent.mojang.com/dungeonsPatchNotes.json").read().decode('UTF-8'))
     patchNote = {}
     project = "other"
     for i in javaPatchNotes["entries"]:
@@ -308,6 +325,11 @@ async def historyGet(ctx, version):
             if i["versions"][patchVersion] == version:
                 patchNote = i
                 project = "MCL"
+    for i in dungeonsPatchNotes["entries"]:
+        if i["version"] == version:
+            patchNote = i
+            project = "MCD"
+            break
     if patchNote == {}:
         await ctx.send("❌ Could not find `"+version+"` in the Launcher patch notes or the Minecraft: Java Edition patch notes.\nMake sure it is in the format `x.y.z`.")
     else:
